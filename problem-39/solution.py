@@ -1,33 +1,44 @@
 class Solution:
     def __init__(self):
-        self._cache = {}
+        self._combinations = []
 
-    def _get_combinations(self, candidates: list[int], target: int) -> list[list[int]]:
-        if target in self._cache:
-            return self._cache[target]
+    def _backtrack(self, candidates: list[int], combination: list[int], index: int, remaining: int):
+        if remaining == 0:
+            self._combinations.append(list(combination))
+            return
         
-        if target == 0:
-            return [[]]
+        if index >= len(candidates):
+            return
+        
+        if remaining < 0:
+            return
 
-        if target < 0:
-            return []
-        
-        result = []
-        for candidate in candidates:
-            combinations = self._get_combinations(
-                candidates=candidates,
-                target=target - candidate
-            )
-            for combination in combinations:
-                result.append(combination + [candidate])
-        
-        self._cache[target] = result
-        return result
-
+        # Pick candidates[index]
+        candidate = candidates[index]
+        combination.append(candidate)
+        self._backtrack(
+            candidates=candidates,
+            combination=combination,
+            index=index,
+            remaining=remaining - candidate,
+        )
+        combination.pop()
+        self._backtrack(
+            candidates=candidates,
+            combination=combination,
+            index=index+1,
+            remaining=remaining,
+        )
 
     def combinationSum(self, candidates: list[int], target: int) -> list[list[int]]:
-        result = self._get_combinations(
-            candidates=set(sorted(candidates, reverse=True)),
-            target=target,
+        self._backtrack(
+            candidates=sorted(set(candidates)),
+            combination=[],
+            index=0,
+            remaining=target,
         )
-        return [list(y) for y in set([tuple(sorted(x)) for x in result])]
+        return self._combinations
+    
+
+
+print(Solution().combinationSum([2,3,5], 8))
